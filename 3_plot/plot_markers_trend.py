@@ -7,9 +7,12 @@ import seaborn as sns
 
 from sext import pageTest
 
-sns.set_context('paper', rc={'font.size': 12, 'axes.labelsize': 12,
+sns.set_context('paper', rc={'font.size': 14,
+                             'axes.labelsize': 14,
                              'lines.linewidth': .5,
-                             'xtick.labelsize': 7, 'ytick.labelsize': 10})
+                             'axes.titlesize': 18,
+                             'xtick.labelsize': 12,
+                             'ytick.labelsize': 12})
 sns.set_style('white',
               {'font.sans-serif': ['Helvetica'],
                'pdf.fonttype': 42,
@@ -20,6 +23,7 @@ mpl.rcParams.update({'font.weight': 'ultralight'})
 sns.set_color_codes()
 current_palette = sns.color_palette()
 
+run = '20200226_stages'
 
 # subjects = [f's{x:02}'
 #             for x in [1, 6, 8, 9, 11, 15, 16, 21, 23, 24, 25, 26, 30, 31]]
@@ -67,7 +71,7 @@ reductions_names = [
     'sleep/N2_G5/meg/trim_mean80'
 ]
 
-final_df = pd.read_csv('../data/all_results_20191016_stages.csv', sep=';')
+final_df = pd.read_csv(f'../data/all_results_{run}_stages.csv', sep=';')
 if subjects is not None:
     final_df = final_df[final_df['Subject'].isin(subjects)]
 else:
@@ -96,7 +100,7 @@ _reductions_maps = {
     'sleep/Group2/meg/trim_mean80': r"D2" + "\n" + r"(flattening)",
     'sleep/Group3/meg/trim_mean80': r"D3" + "\n" + r"(theta)",
     'sleep/Group4/meg/trim_mean80': r"D4" + "\n" + r"(sharp waves)",
-    'sleep/N2_G5/meg/trim_mean80': r'NREM-2'}
+    'sleep/N2_G5/meg/trim_mean80': r'N2'}
 
 order = [_reductions_maps[k] for k in reductions_names]
 
@@ -117,23 +121,27 @@ g = sns.catplot(
     data=first_df, legend=False, sharey=False, hue_order=subjects, order=order,
     kind='point')
 
-g.axes[0, 0].set_title('Power Spectral Density', fontsize=14)
+g.axes[0, 0].set_title('Power Spectral Density')
 g.axes[1, 0].set_title('')
 # rc('text', usetex=True)
-g.axes[0, 0].set_ylabel(r"dB/Hz", fontsize=8)
-g.axes[1, 0].set_ylabel(r"dB/Hz", fontsize=8)
+g.axes[0, 0].set_ylabel(r"dB/Hz")
+g.axes[1, 0].set_ylabel(r"dB/Hz")
 # rc('text', usetex=False)
 g.axes[1, 0].set_xlabel('')
-g.axes[0, 1].set_title('Permutation Entropy', fontsize=14)
+g.axes[0, 1].set_title('Permutation Entropy')
 g.axes[1, 1].set_title('')
-g.axes[0, 1].set_ylabel('bits', fontsize=8)
-g.axes[1, 1].set_ylabel('bits', fontsize=8)
-g.axes[1, 1].set_xlabel('Drowsiness stages', fontsize=14)
-g.axes[0, 2].set_title('wSMI', fontsize=14)
+g.axes[0, 1].set_ylabel('bits')
+g.axes[1, 1].set_ylabel('bits')
+g.axes[1, 1].set_xlabel('Vigilance stages')
+g.axes[0, 2].set_title('wSMI')
 g.axes[1, 2].set_title('')
-g.axes[0, 2].set_ylabel('p.d.u.', fontsize=8)
-g.axes[1, 2].set_ylabel('p.d.u.', fontsize=8)
+g.axes[0, 2].set_ylabel('p.d.u.')
+g.axes[1, 2].set_ylabel('p.d.u.')
 g.axes[1, 2].set_xlabel('')
+
+g.axes[1, 0].set_xticklabels(g.axes[1, 0].get_xticklabels(), rotation=60)
+g.axes[1, 1].set_xticklabels(g.axes[1, 1].get_xticklabels(), rotation=60)
+g.axes[1, 2].set_xticklabels(g.axes[1, 2].get_xticklabels(), rotation=60)
 
 marker_names = [
     'PowerSpectralDensity', 'PermutationEntropy', 'SymbolicMutualInformation']
@@ -147,35 +155,54 @@ for i_m, t_m in enumerate(marker_names):
                     ['Subject', 'Reduction']).unstack()
         stat_df.columns = stat_df.columns.levels[1]
         stat_df = stat_df[order]
+
+        means = stat_df.mean()
+        stds = stat_df.std()
+
         ascending = bool(stat_df.mean()[-1] > stat_df.mean()[0])
         print('Ascending' if ascending else 'Descending')
         L, p = pageTest(stat_df, 'Subject', order, ascending=ascending)
         text = f'L={L} \np={p:.2e}'
         print(f'{t_m} {t_f} {text}')
         if t_f == "Theta":
-            pos = (0.25 + 0.31 * i_m, 0.85)
+            pos = (0.25 + 0.31 * i_m, 0.86)
         else:
-            pos = (0.25 + 0.31 * i_m, 0.4)
+            pos = (0.25 + 0.31 * i_m, 0.45)
         if t_m == "PowerSpectralDensity" and t_f == "Theta":
-            pos = (0.25 + 0.31 * i_m, 0.58)
+            pos = (0.25 + 0.31 * i_m, 0.6)
         g.axes[-1, -1].annotate(
             text,
             xy=pos,
-            xycoords='figure fraction', fontsize=8, annotation_clip=False)
+            xycoords='figure fraction', fontsize=12, annotation_clip=False)
 
-g.fig.subplots_adjust(left=0.065)
+        t_ax = g.axes[i_f, i_m]
+        x = t_ax.get_xticks()
+        t_ax.errorbar(x, means.values, yerr=stds.values, color='k', lw=2,
+                      zorder=100)
+
+g.fig.subplots_adjust(
+    top=0.917,
+    bottom=0.159,
+    left=0.07,
+    right=0.98,
+    hspace=0.111,
+    wspace=0.181
+)
 g.axes[0, 0].annotate(
-    'Theta', xy=(-0.22, 0.45), xycoords='axes fraction', annotation_clip=False,
-    rotation=90, fontsize=14)
+    'Computed in Theta Band', xy=(-0.24, 0.18), xycoords='axes fraction',
+    annotation_clip=False, rotation=90, fontsize=16)
 
 g.axes[1, 0].annotate(
-    'Alpha', xy=(-0.22, 0.45), xycoords='axes fraction', annotation_clip=False,
-    rotation=90, fontsize=14)
+    'Computed in Alpha Band', xy=(-0.24, 0.18), xycoords='axes fraction',
+    annotation_clip=False, rotation=90, fontsize=16)
+
+data_interval = f'{prefix} stimulus'
+# title = f'Markers by vigilance stage ({data_interval})'
+# g.fig.suptitle(title)
 
 g.fig.savefig(f'../figures/stages/{prefix}_{plot_type}_stages.pdf')
 g.fig.savefig(f'../figures/stages/{prefix}_{plot_type}_stages.png')
 plt.close(g.fig)
-
 
 if post is False:
     markers = ['nice_sandbox/marker/Ratio/theta_alpha']
@@ -200,19 +227,32 @@ stat_df = second_df[['Subject', 'Reduction', 'Value']].set_index(
     ['Subject', 'Reduction']).unstack()
 stat_df.columns = stat_df.columns.levels[1]
 stat_df = stat_df[order]
+means = stat_df.mean()
+stds = stat_df.std()
 ascending = bool(stat_df.mean()[-1] > stat_df.mean()[0])
 print('Ascending' if ascending else 'Descending')
 L, p = pageTest(stat_df, 'Subject', order, ascending=ascending)
 text = f'L={L} \np={p:.2e}'
-
+print(f'{markers[0]} {text}')
 pos = (0.25, 0.7)
-ax.annotate(text, xy=pos, xycoords='figure fraction', fontsize=8,
+ax.annotate(text, xy=pos, xycoords='figure fraction', fontsize=12,
             annotation_clip=False)
 
-ax.set_title('Theta/Alpha', fontsize=14)
+ax.set_title(f'Theta/Alpha ({data_interval})', fontsize=16) 
 ax.set_ylabel('Ratio')
-ax.set_xlabel('Drowsiness stages', fontsize=14)
+ax.set_xlabel('Vigilance stages', fontsize=16)
+x = ax.get_xticks()
+ax.errorbar(x, means.values, yerr=stds.values, color='k', lw=2, zorder=100)
 
+
+fig.subplots_adjust(
+    top=0.924,
+    bottom=0.152,
+    left=0.134,
+    right=0.965,
+    hspace=0.2,
+    wspace=0.2
+)
 fig.savefig(f'../figures/stages/{prefix}_theta_alpha_stages.pdf')
 fig.savefig(f'../figures/stages/{prefix}_theta_alpha_stages.png')
 plt.close(fig)
