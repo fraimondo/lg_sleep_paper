@@ -36,10 +36,10 @@ _d_names = {
 _markers_ = ['K', 'PE $\\theta$', 'SE90', '$H\\gamma$', 'SMI $\\alpha$',
              '$\\theta$', 'PE $\\alpha$', '$\\gamma$', 'SMI $\\theta$',
              'wSMI $\\theta$', '$\\|H\\gamma\\|$', 'SE95', 'SE', '$\\delta$',
-              '$\\|\\beta\\|$', 'PE $\\gamma$', 'MSF', '$\\|\\gamma\\|$',
-              'wSMI $\\alpha$', '$\\beta$', '$\\|\\theta\\|$', 'PE $\\beta$',
-              '$\\|\\delta\\|$', '$\\alpha$', '$\\theta/\\alpha$',
-              '$\\|\\alpha\\|$']
+             '$\\|\\beta\\|$', 'PE $\\gamma$', 'MSF', '$\\|\\gamma\\|$',
+             'wSMI $\\alpha$', '$\\beta$', '$\\|\\theta\\|$', 'PE $\\beta$',
+             '$\\|\\delta\\|$', '$\\alpha$', '$\\theta/\\alpha$',
+             '$\\|\\alpha\\|$']
 
 
 current_palette = [x for x in mpl.cm.get_cmap('tab20b').colors] + \
@@ -100,7 +100,7 @@ for t_period in periods:
         verticalalignment='top',
         horizontalalignment='center')
 
-    fig.subplots_adjust(
+    fig_short.subplots_adjust(
         top=0.72,
         bottom=0.22,
         left=0.065,
@@ -109,6 +109,8 @@ for t_period in periods:
         wspace=0.35
     )
     # fig.suptitle(f'Feature importances (Extra-Trees, {t_period} stimulus)')
-    fig.savefig(f'../figures/decoding/importances_MR_{t_period}.pdf')
-    fig.savefig(f'../figures/decoding/importances_MR_{t_period}.png', dpi=300)
+    fig_short.savefig(
+        f'../figures/decoding/importances_MR_{t_period}.pdf')
+    fig_short.savefig(
+        f'../figures/decoding/importances_MR_{t_period}.png', dpi=300)
     # plt.close(fig)
