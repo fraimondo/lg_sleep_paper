@@ -15,7 +15,7 @@ import nice.utils as nutils
 
 import sys
 sys.path.append('../')
-from lib.constants import mr_groups, stage_groups  # noqa
+from lib.constants import hori_mr_groups, hori_groups  # noqa
 from lib.io import read_lg_epochs  # noqa
 from lib.markers import get_markers, get_reductions, trim_mean80  # noqa
 from lib.utils import configure_logging, log_versions,\
@@ -29,7 +29,7 @@ default_out_path = '../data/subjects/'
 
 start_time = time.time()
 
-parser = ArgumentParser(description='Run the pipeline on the selected suject')
+parser = ArgumentParser(description='Run the pipeline on the selected subject')
 
 parser.add_argument('--path', metavar='path', nargs=1, type=str,
                     help='Path with the database.',
@@ -81,8 +81,8 @@ logger.info(f'Using db from {db_path}')
 
 final_df = None
 all_topos = None
-this_groups = {k: v for k, v in stage_groups.items()}
-this_groups.update(mr_groups)
+this_groups = {k: v for k, v in hori_groups.items()}
+this_groups.update(hori_mr_groups)
 
 # if True:
 try:

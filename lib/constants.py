@@ -49,6 +49,18 @@ stage_groups = {
                'Stage16', 'Stage16/mr0', 'Stage16/mr1']
 }
 
+hori_groups = {
+    'H0': ['Stage0', 'Stage0/mr0', 'Stage0/mr1'],
+    'H1': ['Stage1', 'Stage1/mr0', 'Stage1/mr1'],
+    'H2': ['Stage2', 'Stage2/mr0', 'Stage2/mr1'],
+    'H3': ['Stage3', 'Stage3/mr0', 'Stage3/mr1'],
+    'H4': ['Stage4', 'Stage4/mr0', 'Stage4/mr1'],
+    'H5': ['Stage5', 'Stage5/mr0', 'Stage5/mr1'],
+    'H6to8': ['Stage6', 'Stage6/mr0', 'Stage6/mr1',
+              'Stage7', 'Stage7/mr0', 'Stage7/mr1',
+              'Stage8', 'Stage8/mr0', 'Stage8/mr1'],
+}
+
 mr_groups = {
     'Awake_MR0': ['LG1/mr/mr0', 'LG3/mr/mr0'],
     'Awake_MR1': ['LG1/mr/mr1', 'LG3/mr/mr1'],
@@ -66,6 +78,25 @@ mr_groups = {
                    'Stage16/mr0'],
     'Group5_MR1': ['Stage9/mr1', 'Stage10/mr1', 'Stage12/mr1', 'Stage13/mr1',
                    'Stage16/mr1']
+}
+
+hori_mr_groups = {
+    'Awake_MR0': ['LG1/mr/mr0', 'LG3/mr/mr0'],
+    'Awake_MR1': ['LG1/mr/mr1', 'LG3/mr/mr1'],
+    'H0_MR0': ['Stage0/mr0'],
+    'H0_MR1': ['Stage0/mr1'],
+    'H1_MR0': ['Stage1/mr0'],
+    'H1_MR1': ['Stage1/mr1'],
+    'H2_MR0': ['Stage2/mr0'],
+    'H2_MR1': ['Stage2/mr1'],
+    'H3_MR0': ['Stage3/mr0'],
+    'H3_MR1': ['Stage3/mr1'],
+    'H4_MR0': ['Stage4/mr0'],
+    'H4_MR1': ['Stage4/mr1'],
+    'H5_MR0': ['Stage5/mr0'],
+    'H5_MR1': ['Stage5/mr1'],
+    'H6to8_MR0': ['Stage6/mr0', 'Stage7/mr0', 'Stage8/mr0'],
+    'H6to8_MR1': ['Stage6/mr1', 'Stage7/mr1', 'Stage8/mr1'],
 }
 
 # Awake -> LG1 and LG3

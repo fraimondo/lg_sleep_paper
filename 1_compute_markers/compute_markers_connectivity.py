@@ -11,7 +11,7 @@ from mne.utils import logger
 
 import sys
 sys.path.append('../')
-from lib.constants import mr_groups, stage_groups  # noqa
+from lib.constants import hori_mr_groups, hori_groups  # noqa
 from lib.io import read_lg_epochs  # noqa
 from lib.markers import get_conn_markers # noqa
 from lib.utils import configure_logging, log_versions,\
@@ -77,8 +77,8 @@ logger.info(f'Using db from {db_path}')
 
 final_df = None
 all_topos = None
-this_groups = {k: v for k, v in stage_groups.items()}
-this_groups.update(mr_groups)
+this_groups = {k: v for k, v in hori_groups.items()}
+this_groups.update(hori_mr_groups)
 
 # if True:
 try:

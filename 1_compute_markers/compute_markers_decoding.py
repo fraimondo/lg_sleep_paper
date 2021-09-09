@@ -13,7 +13,7 @@ import nice.utils as nutils
 
 import sys
 sys.path.append('../')
-from lib.constants import mr_groups  # noqa
+from lib.constants import hori_mr_groups  # noqa
 from lib.io import read_lg_epochs  # noqa
 from lib.markers import get_markers, get_reductions, trim_mean80  # noqa
 from lib.utils import configure_logging, log_versions,\
@@ -81,7 +81,7 @@ final_df = None
 try:
     # Read
     decoding_dfs = []
-    for t_group, t_stages in mr_groups.items():
+    for t_group, t_stages in hori_mr_groups.items():
         epochs = read_lg_epochs(s_path, t_stages)
         if epochs is None:
             continue
