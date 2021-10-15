@@ -233,7 +233,7 @@ def get_conn_markers():
             tmin=None, tmax=0.6, method='default', backend='openmp', tau=8,
             method_params={'nthreads': 'auto', 'bypass_csd': True,
                            'filter_freq': 8.0},
-            comment='theta'),
+            comment='theta')
 
     # WSMI Alpha (250/3/4 ~ <20.83 Hz)
     wsmi_alpha = SymbolicMutualInformation(
@@ -247,7 +247,7 @@ def get_conn_markers():
             tmin=None, tmax=0.6, method='default', backend='openmp', tau=4,
             method_params={'nthreads': 'auto', 'bypass_csd': True,
                            'filter_freq': 12.0},
-            comment='alpha'),
+            comment='alpha')
 
     m_list = [
         wsmi_theta,

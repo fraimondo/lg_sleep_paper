@@ -3,8 +3,8 @@ from pathlib import Path
 
 from argparse import ArgumentParser
 
-in_path = '/data/group/appliedml/fraimondo/lg_meg_sleep/data/'
-out_path = '/data/group/appliedml/fraimondo/lg_meg_sleep/data/results'
+in_path = '/data/project/lg_meg_sleep/data'
+out_path = '/data/project/lg_meg_sleep/data/results'
 env = 'nice'
 
 parser = ArgumentParser(description='Queue the pipeline')
