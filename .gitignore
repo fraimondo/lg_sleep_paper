@@ -91,3 +91,6 @@ ENV/
 
 data/subjects
 .vscode
+*.submit
+*/logs
+data/
