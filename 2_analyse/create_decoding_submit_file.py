@@ -43,7 +43,7 @@ error          = {log_dir.as_posix()}/$(log_fname).err
 """
 
 
-submit_fname = f'decoding_balanced.submit'
+submit_fname = 'decoding_balanced.submit'
 
 with open(submit_fname, 'w') as submit_file:
     submit_file.write(preamble)
