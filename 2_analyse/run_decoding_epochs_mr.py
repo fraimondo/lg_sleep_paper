@@ -5,25 +5,26 @@ import pandas as pd
 
 from joblib import Parallel, delayed
 
-from sklearn.model_selection import cross_val_score, RepeatedStratifiedKFold
+from sklearn.model_selection import cross_validate, RepeatedStratifiedKFold
 
 import sys
 sys.path.append('../')
-from lib.ml import get_bootstrap, eval_bs, get_model  # noqa
+from lib.ml import (get_bootstrap, eval_bs, get_model,  # noqa
+                    sanitise_cross_validate, sanitise_eval_bs)
 
-groups = [f'Group{x}' for x in range(1, 5)] + ['Awake']
+groups = [f'H{x}' for x in range(1, 6)] + ['Awake', 'H6to8']
 
 data_path = Path('../data')
-run = '20200226_decoding'
+run = '09092021_decoding'
 
-final_df = pd.read_csv(data_path / f'all_results_{run}_decoding.csv', sep=';')
+final_df = pd.read_csv(data_path / f'all_results_{run}.csv', sep=';')
 
 
 # This script takes all the epochs and decodes MR+ from MR- for each stage,
 # Using all the 26 features.
 
 # Which period to extract the features from
-period = 'pre'
+period = 'post'
 # If do_cv is True, then it will cross-validate within SO
 do_cv = True
 # If do_cross_so is True, then it will train the models with all the data from
@@ -34,6 +35,7 @@ do_cross_so = True
 do_feat_importance = True
 
 n_jobs = -1
+n_bootstrap = 1000
 
 
 if period == 'pre':
@@ -73,16 +75,21 @@ if do_cv is True:
 
         for clf_name, clf in cv_estimators[t_group].items():
             start_clf = time.time()
-            t_auc = cross_val_score(clf, X, y, cv=cv, n_jobs=-1,
-                                    scoring='roc_auc')
+            scoring = ['roc_auc']
+            if clf_name != 'dummy-negative':
+                scoring += ['precision', 'recall', 'average_precision']
+
+            cross_validate_results = cross_validate(
+                clf, X, y, cv=cv, n_jobs=-1, scoring=scoring)
             elapsed = time.strftime(
                 '%M:%S', time.gmtime(time.time() - start_clf))
-            print(f'{clf_name} = {np.mean(t_auc)} ({elapsed})')
-            t_df = pd.DataFrame({
-                'AUC': t_auc,
-                'Classifier': [clf_name] * len(t_auc),
-                'SO': [t_group] * len(t_auc),
-                'Fold': np.arange(1, len(t_auc) + 1)})
+            t_df = sanitise_cross_validate(cross_validate_results)
+
+            print(f'{clf_name} = {t_df.mean()} ({elapsed})')
+
+            t_df['SO'] = t_group
+            t_df['Classifier'] = clf_name
+
             cv_results.append(t_df)
         elapsed = time.strftime(
             '%M:%S', time.gmtime(time.time() - start_group))
@@ -131,19 +138,18 @@ if do_cross_so is True:
 
             for clf_name, clf in full_estimators[t_group_fit].items():
                 start_clf = time.time()
-                t_aucs = []
-                bs = get_bootstrap(y_test, 1000)
-                t_aucs = Parallel(n_jobs=n_jobs)(delayed(eval_bs)(
+                t_results = []
+                bs = get_bootstrap(y_test, n_bootstrap)
+                t_results = Parallel(n_jobs=n_jobs)(delayed(eval_bs)(
                     clf=clf, X_test=X_test, bs_inds0=bs_inds0,
-                    bs_inds1=bs_inds1, y_bs=y_bs)
+                    bs_inds1=bs_inds1, y_bs=y_bs,
+                    full_scoring=clf_name != 'dummy-negative')
                     for bs_inds0, bs_inds1, y_bs in bs)
+                t_df = sanitise_eval_bs(t_results)
+                t_df['Classifier'] = clf_name
+                t_df['SO_train'] = t_group_fit
+                t_df['SO_test'] = t_group_test
 
-                t_df = pd.DataFrame({
-                    'AUC': t_aucs,
-                    'Classifier': [clf_name] * len(t_aucs),
-                    'SO_train': [t_group_fit] * len(t_aucs),
-                    'SO_test': [t_group_test] * len(t_aucs),
-                    'BS': np.arange(1, len(t_aucs) + 1)})
                 cross_so_results.append(t_df)
                 elapsed = time.strftime(
                     '%M:%S', time.gmtime(time.time() - start_clf))
@@ -167,7 +173,7 @@ if do_feat_importance is True:
         X_train = to_train[markers].values
         y_train = (to_train['MR'].values == 'MR+').astype(np.int)
         # Bootstrap on the training set
-        bs = get_bootstrap(y_train, 1000)
+        bs = get_bootstrap(y_train, n_bootstrap)
         for i_bs, (bs_inds0, bs_inds1, y_bs) in enumerate(bs):
             model.fit(X_train[np.r_[bs_inds0, bs_inds1]],
                       y_train[np.r_[bs_inds0, bs_inds1]])

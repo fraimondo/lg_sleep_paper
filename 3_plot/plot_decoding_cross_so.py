@@ -23,18 +23,20 @@ current_palette = sns.color_palette()
 
 # periods = ['pre', 'post', 'all']
 # periods = ['pre', 'post']
-periods = ['post']
+periods = ['pre', 'post']
 # classifiers = ['et-reduced', 'gssvm']
 classifiers = ['et-reduced']
 
 _d_names = {
-    'Awake': r"Awake",
-    'Group1': r"D1" + "\n" + r"(alpha)",
-    'Group2': r"D2" + "\n" + r"(flattening)",
-    'Group3': r"D3" + "\n" + r"(theta)",
+    'Awake': r"W",
+    'H1': r"H1",
+    'H2': r"H2",
+    'H3': r"H3",
+    'H4': r"H4",
+    'H5': r"H5",
 }
 
-order = ['Awake', 'Group1', 'Group2', 'Group3']
+order = ['Awake', 'H1', 'H2', 'H3', 'H4', 'H5']
 
 all_df_bs = []
 all_df_cv = []
@@ -152,7 +154,7 @@ for t_period in periods:
                 if i_test == 0:
                     t_ax.annotate(
                         f'Train in {_d_names[t_group_train]}',
-                        xy=(0.065 + 0.1165 * (i_train * 2 + 1), 0.92),
+                        xy=(0.065 + 0.0775 * (i_train * 2 + 1), 0.92),
                         xycoords='figure fraction',
                         annotation_clip=False,
                         verticalalignment='top',

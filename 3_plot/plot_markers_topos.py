@@ -14,7 +14,6 @@ from sext import pageTest
 
 import sys
 sys.path.append('../')
-from lib.constants import stage_groups  # noqa E402
 from lib import utils  # noqa E402
 
 sns.set_context('paper', rc={'font.size': 12, 'axes.labelsize': 12,
@@ -30,7 +29,7 @@ mpl.rcParams.update({'font.weight': 'ultralight'})
 sns.set_color_codes()
 current_palette = sns.color_palette()
 
-run = '20200226_stages'
+run = '09092021_stages'
 
 
 subjects = ['s01', 's02', 's05', 's06', 's07', 's08', 's09', 's10', 's11',
@@ -39,23 +38,26 @@ subjects = ['s01', 's02', 's05', 's06', 's07', 's08', 's09', 's10', 's11',
 
 reductions = [
     'W/meg/trim_mean80',
-    'Group1/meg/trim_mean80',
-    'Group2/meg/trim_mean80',
-    'Group3/meg/trim_mean80',
-    'Group4/meg/trim_mean80',
-    'N2_G5/meg/trim_mean80'
+    'H1/meg/trim_mean80',
+    'H2/meg/trim_mean80',
+    'H3/meg/trim_mean80',
+    'H4/meg/trim_mean80',
+    'H5/meg/trim_mean80',
+    'H6to8/meg/trim_mean80',
+    'N2/meg/trim_mean80'
 ]
-
 _reductions_maps = {
     'W/meg/trim_mean80': 'Awake',
-    'Group1/meg/trim_mean80': r"D1" + "\n" + r"(alpha)",
-    'Group2/meg/trim_mean80': r"D2" + "\n" + r"(flattening)",
-    'Group3/meg/trim_mean80': r"D3" + "\n" + r"(theta)",
-    'Group4/meg/trim_mean80': r"D4" + "\n" + r"(sharp waves)",
-    'N2_G5/meg/trim_mean80': r'N2'}
+    'H1/meg/trim_mean80': r"H1",
+    'H2/meg/trim_mean80': r"H2",
+    'H3/meg/trim_mean80': r"H3",
+    'H4/meg/trim_mean80': r"H4",
+    'H5/meg/trim_mean80': r"H5",
+    'H6to8/meg/trim_mean80': r"H6-8",
+    'N2/meg/trim_mean80': r'N2'}
 
 
-post = True
+post = False
 
 if post is False:
     markers = [
@@ -80,7 +82,7 @@ else:
     ]
     prefix = 'post'
 
-all_topos = sio.loadmat(f'../data/all_results_{run}_stages_topos.mat')
+all_topos = sio.loadmat(f'../data/all_results_{run}_topos.mat')
 
 info = utils._get_info()
 
@@ -97,10 +99,9 @@ plot_info = mne.pick_info(info, mne.pick_types(info, meg='mag'))
 all_stats = {t_s: {} for t_s in ['mag', 'grad']}
 
 for to_plot in ['mag', 'grad']:
-
     fig, axes = plt.subplots(
         len(markers), len(reductions) + 1,
-        figsize=(14, 14))
+        figsize=(18, 11))
 
     t_picks = mne.pick_types(info, meg=to_plot)
 
@@ -127,13 +128,16 @@ for to_plot in ['mag', 'grad']:
         all_subjects_data = np.array(all_subjects_data)
         means = all_subjects_data.mean(axis=2).mean(axis=1)
         ascending = bool(means[-1] > means[0])
-        tests = np.array(
+        page_tests = np.array(
             [pageTest(all_subjects_data[:, :, x].T.copy(), ascending=ascending)
              for x in range(all_subjects_data.shape[2])])
-        all_stats[to_plot][t_marker] = tests
+        all_stats[to_plot][t_marker] = page_tests
         vmin = np.min(all_data)
         vmax = np.max(all_data)
 
+        i_topo = 0
+        ax = None
+        im = None
         for i_topo in range(all_data.shape[0]):
             topo = all_data[i_topo]
             ax = axes[i_marker, i_topo]
@@ -147,15 +151,15 @@ for to_plot in ['mag', 'grad']:
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.05)
         cbar = plt.colorbar(im, cax=cax, ticks=(vmin, vmax), format='%0.3f')
-        cbar.set_label(utils._map_key_to_unit(t_marker))
-        cbar.ax.get_yaxis().labelpad = -20
+        labelpad = -32 if i_marker in [0, 3] else -20
+        cbar.set_label(utils._map_key_to_unit(t_marker), labelpad=labelpad)
         cbar.ax.tick_params(labelsize=8)
         axes[i_marker, 0].set_ylabel(
             utils._map_key_to_text(t_marker), fontsize=14,
             rotation=90, labelpad=20, multialignment='center')
 
-        topo = -np.log10(tests[:, 1])
         ax = axes[i_marker, i_topo + 1]
+        topo = -np.log10(page_tests[:, 1])
         im, _ = mne.viz.topomap.plot_topomap(
             topo, pos=plot_info, vmin=stat_vmin, vmax=stat_vmax, axes=ax,
             cmap=stat_cmap,
@@ -164,13 +168,13 @@ for to_plot in ['mag', 'grad']:
 
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.05)
-        cbar = plt.colorbar(im, cax=cax,
-                            ticks=(stat_vmin, stat_sig, stat_vmax),
-                            format='%0.3f')
-        cbar.ax.set_label(r'$-log_{10}(p)$')
-        cbar.ax.set_yticklabels(['p=1', 'p=0.05', 'p=0.0001'])
-        cbar.ax.get_yaxis().labelpad = -20
-        cbar.ax.tick_params(labelsize=8)
+        stat_cbar = plt.colorbar(im, cax=cax,
+                                 ticks=(stat_vmin, stat_sig, stat_vmax),
+                                 format='%0.3f')
+        if i_marker == 0:
+            stat_cbar.ax.set_title(r'$-log_{10}(p)$')
+        stat_cbar.ax.set_yticklabels(['p=1', 'p=0.05', 'p=0.0001'])
+        stat_cbar.ax.tick_params(labelsize=8)
         if i_marker == 0:
             ax.set_title("Page's\nTest", fontsize=14)
 
@@ -184,7 +188,7 @@ for to_plot in ['mag', 'grad']:
         left=0.035,
         right=0.93,
         hspace=0.2,
-        wspace=0.1
+        wspace=0.09
     )
     fig.savefig(f'../figures/stages/{prefix}_marker_topos_{to_plot}.pdf',
                 bbox_inches='tight')

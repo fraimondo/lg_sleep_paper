@@ -221,38 +221,46 @@ def _get_markers_post():
 
 
 def get_conn_markers():
-    m_list = [
-
-        # WSMI Theta (250/3/8 ~ <10.41 Hz)
-        SymbolicMutualInformation(
+    # WSMI Theta (250/3/8 ~ <10.41 Hz)
+    wsmi_theta = SymbolicMutualInformation(
             tmin=None, tmax=0.6, method='weighted', backend='openmp', tau=8,
             method_params={'nthreads': 'auto', 'bypass_csd': True,
                            'filter_freq': 8.0},
-            comment='theta_weighted'),
+            comment='theta_weighted')
 
-        # SMI Theta (250/3/8 ~ <10.41 Hz)
-        SymbolicMutualInformation(
+    # SMI Theta (250/3/8 ~ <10.41 Hz)
+    smi_theta = SymbolicMutualInformation(
             tmin=None, tmax=0.6, method='default', backend='openmp', tau=8,
             method_params={'nthreads': 'auto', 'bypass_csd': True,
                            'filter_freq': 8.0},
             comment='theta'),
 
-        # WSMI Alpha (250/3/4 ~ <20.83 Hz)
-        SymbolicMutualInformation(
+    # WSMI Alpha (250/3/4 ~ <20.83 Hz)
+    wsmi_alpha = SymbolicMutualInformation(
             tmin=None, tmax=0.6, method='weighted', backend='openmp', tau=4,
             method_params={'nthreads': 'auto', 'bypass_csd': True,
                            'filter_freq': 12.0},
-            comment='alpha_weighted'),
+            comment='alpha_weighted')
 
-        # SMI Alpha (250/3/4 ~ <20.83 Hz)
-        SymbolicMutualInformation(
+    # SMI Alpha (250/3/4 ~ <20.83 Hz)
+    smi_alpha = SymbolicMutualInformation(
             tmin=None, tmax=0.6, method='default', backend='openmp', tau=4,
             method_params={'nthreads': 'auto', 'bypass_csd': True,
                            'filter_freq': 12.0},
             comment='alpha'),
 
-        # # With this we can keep the epochs to check conditions
-        # TimeLockedTopography(tmin=0.064, tmax=0.112, comment='p1'),
+    m_list = [
+        wsmi_theta,
+        smi_theta,
+        wsmi_alpha,
+        smi_alpha,
+
+
+        Ratio(numerator=wsmi_theta, denominator=wsmi_alpha,
+              comment='wsmi_theta_alpha'),
+
+        Ratio(numerator=smi_theta, denominator=smi_alpha,
+              comment='smi_theta_alpha')
 
     ]
 
@@ -374,7 +382,7 @@ def get_reductions(epochs_fun, markers, stages=None, sensors='all'):
             'channels': scalp_roi,
             'times': None}}
 
-    reduction_params['Ratio'] = {
+    reduction_params['Ratio/post_theta_alpha'] = {
         'reduction_func':
             [{'axis': 'frequency', 'function': np.sum},
              {'axis': 'channels', 'function': channels_fun},
@@ -383,4 +391,6 @@ def get_reductions(epochs_fun, markers, stages=None, sensors='all'):
             'epochs': selected_epochs,
             'channels': scalp_roi}}
 
+    reduction_params['Ratio/theta_alpha'] = \
+        reduction_params['Ratio/post_theta_alpha']
     return reduction_params

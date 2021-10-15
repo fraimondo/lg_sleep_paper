@@ -26,7 +26,7 @@ final_df = pd.read_csv(data_path / f'all_results_{run}_decoding.csv', sep=';')
 # models, trained on either MR+ or MR-. That is, to check if we can decode the
 # SO by looking at MR+ or MR-.
 
-period = 'pre'
+period = 'post'
 do_cv = True
 n_jobs = -1
 

@@ -23,7 +23,7 @@ mpl.rcParams.update({'font.weight': 'ultralight'})
 sns.set_color_codes()
 current_palette = sns.color_palette()
 
-run = '20200226_stages'
+run = '09092021_stages'
 
 # subjects = [f's{x:02}'
 #             for x in [1, 6, 8, 9, 11, 15, 16, 21, 23, 24, 25, 26, 30, 31]]
@@ -64,14 +64,16 @@ plot_errors = False
 
 reductions_names = [
     'sleep/W/meg/trim_mean80',
-    'sleep/Group1/meg/trim_mean80',
-    'sleep/Group2/meg/trim_mean80',
-    'sleep/Group3/meg/trim_mean80',
-    'sleep/Group4/meg/trim_mean80',
-    'sleep/N2_G5/meg/trim_mean80'
+    'sleep/H1/meg/trim_mean80',
+    'sleep/H2/meg/trim_mean80',
+    'sleep/H3/meg/trim_mean80',
+    'sleep/H4/meg/trim_mean80',
+    'sleep/H5/meg/trim_mean80',
+    'sleep/H6to8/meg/trim_mean80',
+    'sleep/N2/meg/trim_mean80'
 ]
 
-final_df = pd.read_csv(f'../data/all_results_{run}_stages.csv', sep=';')
+final_df = pd.read_csv(f'../data/all_results_{run}.csv', sep=';')
 if subjects is not None:
     final_df = final_df[final_df['Subject'].isin(subjects)]
 else:
@@ -96,11 +98,13 @@ for t_red in reductions_names:
 
 _reductions_maps = {
     'sleep/W/meg/trim_mean80': 'Awake',
-    'sleep/Group1/meg/trim_mean80': r"D1" + "\n" + r"(alpha)",
-    'sleep/Group2/meg/trim_mean80': r"D2" + "\n" + r"(flattening)",
-    'sleep/Group3/meg/trim_mean80': r"D3" + "\n" + r"(theta)",
-    'sleep/Group4/meg/trim_mean80': r"D4" + "\n" + r"(sharp waves)",
-    'sleep/N2_G5/meg/trim_mean80': r'N2'}
+    'sleep/H1/meg/trim_mean80': r"H1",
+    'sleep/H2/meg/trim_mean80': r"H2",
+    'sleep/H3/meg/trim_mean80': r"H3",
+    'sleep/H4/meg/trim_mean80': r"H4",
+    'sleep/H5/meg/trim_mean80': r"H5",
+    'sleep/H6to8/meg/trim_mean80': r"H6-8",
+    'sleep/N2/meg/trim_mean80': r'N2'}
 
 order = [_reductions_maps[k] for k in reductions_names]
 
@@ -132,7 +136,7 @@ g.axes[0, 1].set_title('Permutation Entropy')
 g.axes[1, 1].set_title('')
 g.axes[0, 1].set_ylabel('bits')
 g.axes[1, 1].set_ylabel('bits')
-g.axes[1, 1].set_xlabel('Vigilance stages')
+g.axes[1, 1].set_xlabel('Hori stages')
 g.axes[0, 2].set_title('wSMI')
 g.axes[1, 2].set_title('')
 g.axes[0, 2].set_ylabel('p.d.u.')
@@ -197,7 +201,7 @@ g.axes[1, 0].annotate(
     annotation_clip=False, rotation=90, fontsize=16)
 
 data_interval = f'{prefix} stimulus'
-# title = f'Markers by vigilance stage ({data_interval})'
+# title = f'Markers by Hori stage ({data_interval})'
 # g.fig.suptitle(title)
 
 g.fig.savefig(f'../figures/stages/{prefix}_{plot_type}_stages.pdf')
@@ -240,7 +244,7 @@ ax.annotate(text, xy=pos, xycoords='figure fraction', fontsize=12,
 
 ax.set_title(f'Theta/Alpha ({data_interval})', fontsize=16) 
 ax.set_ylabel('Ratio')
-ax.set_xlabel('Vigilance stages', fontsize=16)
+ax.set_xlabel('Hori stages', fontsize=16)
 x = ax.get_xticks()
 ax.errorbar(x, means.values, yerr=stds.values, color='k', lw=2, zorder=100)
 

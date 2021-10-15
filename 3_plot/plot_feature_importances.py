@@ -22,15 +22,17 @@ sns.set_color_codes()
 
 
 # periods = ['pre', 'post', 'all']
-periods = ['post']
+periods = ['pre', 'post']
 
 n_to_plot = 6
 
 _d_names = {
-    'Awake': r"Awake",
-    'Group1': r"D1" + "\n" + r"(alpha)",
-    'Group2': r"D2" + "\n" + r"(flattening)",
-    'Group3': r"D3" + "\n" + r"(theta)",
+    'Awake': r"W",
+    'H1': r"H1",
+    'H2': r"H2",
+    'H3': r"H3",
+    'H4': r"H4",
+    'H5': r"H5",
 }
 
 _markers_ = ['K', 'PE $\\theta$', 'SE90', '$H\\gamma$', 'SMI $\\alpha$',
