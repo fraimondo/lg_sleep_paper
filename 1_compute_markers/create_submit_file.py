@@ -25,7 +25,7 @@ subjects = [x.name for x in in_path.glob('subjects/*') if x.is_dir()]
 
 cwd = os.getcwd()
 
-log_dir = Path(cwd) / 'logs' / 'compute_markers'
+log_dir = Path(cwd) / 'logs' / f'compute_markers_{markers}'
 log_dir.mkdir(exist_ok=True, parents=True)
 
 
