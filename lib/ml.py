@@ -23,6 +23,50 @@ def get_bootstrap(y, n_bootstrap):
         yield bs_inds0, bs_inds1, y_bs
 
 
+def get_balanced_bs(df, y, group, n_bootstrap, y_pos):
+    rng = np.random.RandomState(42)
+    to_bs = df.groupby([y, group])[y].count()
+    groups = df[group].unique()
+    all_y = (df[y].values == y_pos).astype(int)
+    all_group = df[group].values
+    for _ in range(n_bootstrap):
+        bs_inds0 = []
+        bs_inds1 = []
+        for t_group in groups:
+            t_min = to_bs.xs(t_group, level=group).min()
+            if t_min == 0:
+                continue
+            y0_inds = np.intersect1d(
+                np.where(all_group == t_group), np.where(all_y == 0))
+            y1_inds = np.intersect1d(
+                np.where(all_group == t_group), np.where(all_y == 1))
+            t_0 = rng.choice(y0_inds, t_min, replace=True)
+            t_1 = rng.choice(y1_inds, t_min, replace=True)
+            bs_inds0.extend(t_0)
+            bs_inds1.extend(t_1)
+        bs_inds0 = np.array(bs_inds0)
+        bs_inds1 = np.array(bs_inds1)
+        y_bs = np.r_[np.zeros_like(bs_inds0),
+                     np.ones_like(bs_inds1)].astype(int)
+        yield bs_inds0, bs_inds1, y_bs
+
+
+def eval_double_bs(clf, X_train, bs_inds0_train, bs_inds1_train, y_bs_train,
+                   X_test, bs_inds0_test, bs_inds1_test, y_bs_test):
+    to_train = X_train[np.r_[bs_inds0_train, bs_inds1_train]]
+    to_test = X_test[np.r_[bs_inds0_test, bs_inds1_test]]
+
+    clf.fit(to_train, y_bs_train)
+    y_pred_proba = clf.predict_proba(to_test)[:, 1]
+    auc = roc_auc_score(y_bs_test, y_pred_proba)
+
+    precision = -1
+    recall = -1
+    ap = -1
+
+    return auc, precision, recall, ap
+
+
 def eval_bs(clf, X_test, bs_inds0, bs_inds1, y_bs, full_scoring=False):
     to_test = X_test[np.r_[bs_inds0, bs_inds1]]
     y_pred_proba = clf.predict_proba(to_test)[:, 1]
