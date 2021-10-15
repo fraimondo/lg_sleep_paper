@@ -31,6 +31,14 @@ period = args.period
 
 valid_groups = [f'H{x}' for x in range(1, 6)] + ['Awake', 'H6to8']
 
+if isinstance(group_train, list):
+    group_train = group_train[0]
+
+if isinstance(group_test, list):
+    group_test = group_test[0]
+
+if isinstance(period, list):
+    period = period[0]
 
 if group_train not in valid_groups:
     raise ValueError(f'Wrong train group {group_train}')
@@ -56,13 +64,16 @@ n_jobs = 1
 n_bootstrap = 1000
 
 if period == 'pre':
+    print('Using pre markers')
     markers = [x for x in final_df.columns
                if x.startswith('nice') and 'post_' not in x and 'TimeLocked'
                not in x]
 elif period == 'post':
+    print('Using post markers')
     markers = [x for x in final_df.columns
                if x.startswith('nice') and 'post_' in x]
 else:
+    print('Using all markers')
     markers = [x for x in final_df.columns
                if x.startswith('nice') and 'TimeLocked' not in x]
 estimators = ['et-reduced', 'dummy', 'dummy-negative']

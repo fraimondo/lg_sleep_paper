@@ -55,4 +55,7 @@ with open(submit_fname, 'w') as submit_file:
                 submit_file.write(f'train={train_group}\n')
                 submit_file.write(f'test={test_group}\n')
                 submit_file.write(f'period={t_period}\n')
+                submit_file.write(
+                    f'log_fname=decoding_{train_group}_'
+                    f'{test_group}_{t_period}\n')
                 submit_file.write('queue\n\n')
