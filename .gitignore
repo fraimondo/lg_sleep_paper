@@ -93,4 +93,10 @@ data/subjects
 .vscode
 *.submit
 */logs
+scratch
+
+# temporarily out
 data/
+data_old/
+figures/
+stats/
