@@ -6,7 +6,7 @@ import sys
 sys.path.append('../')
 
 
-db_path = Path('/data/group/appliedml/fraimondo/lg_meg_sleep/data/')
+db_path = Path('/data/project/lg_meg_sleep/data')
 run = '09092021_decoding'
 
 in_path = db_path / 'results' / run

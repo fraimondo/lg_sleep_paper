@@ -9,7 +9,7 @@ import sys
 sys.path.append('../')
 from lib.constants import plot3d_rois, meg_ch_names  # noqa
 
-db_path = Path('/data/group/appliedml/fraimondo/lg_meg_sleep/data/')
+db_path = Path('/data/project/lg_meg_sleep/data')
 out_path = Path('../data')
 run = '09092021_connectivity'
 
@@ -42,7 +42,9 @@ markers = [
     'nice_marker_SymbolicMutualInformation_theta_weighted',
     'nice_marker_SymbolicMutualInformation_theta',
     'nice_marker_SymbolicMutualInformation_alpha_weighted',
-    'nice_marker_SymbolicMutualInformation_alpha'
+    'nice_marker_SymbolicMutualInformation_alpha',
+    'nice_sandbox_marker_Ratio_wsmi_theta_alpha',
+    'nice_sandbox_marker_Ratio_smi_theta_alpha'
 ]
 
 conn_means = {x: {} for x in markers}

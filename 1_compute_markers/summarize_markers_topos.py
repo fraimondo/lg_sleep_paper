@@ -5,7 +5,7 @@ import numpy as np
 from scipy import io as sio
 
 
-db_path = Path('/data/group/appliedml/fraimondo/lg_meg_sleep/data/')
+db_path = Path('/data/project/lg_meg_sleep/data')
 run = '09092021_stages'
 
 in_path = db_path / 'results' / run
