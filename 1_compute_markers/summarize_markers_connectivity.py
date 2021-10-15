@@ -9,14 +9,15 @@ import sys
 sys.path.append('../')
 from lib.constants import plot3d_rois, meg_ch_names  # noqa
 
-db_path = Path('../data')
-run = '20200226_connectivity'
+db_path = Path('/data/group/appliedml/fraimondo/lg_meg_sleep/data/')
+out_path = Path('../data')
+run = '09092021_connectivity'
 
-in_path = db_path / 'subjects' / run
+in_path = db_path / 'results' / run
 
 groups_to_consider = [
-    'Group1_MR0', 'Group2_MR0', 'Group3_MR0', 'Group4_MR0', 'Group5_MR0',
-    'Group1_MR1', 'Group2_MR1', 'Group3_MR1', 'Group4_MR1', 'Group5_MR1'
+    'H1_MR0', 'H2_MR0', 'H3_MR0', 'H4_MR0', 'H5_MR0', 'H6to8_MR0',
+    'H1_MR1', 'H2_MR1', 'H3_MR1', 'H4_MR1', 'H5_MR1', 'H6to8_MR1'
 ]
 
 for t_group in groups_to_consider:
@@ -33,7 +34,7 @@ for t_group in groups_to_consider:
         t_group_conns['subjects'].append(subject)
     if len(t_group_conns['subjects']) > 0:
         sio.savemat(
-            db_path / f'all_conn_{run}_{t_group}-conn.mat', t_group_conns)
+            out_path / f'all_conn_{run}_{t_group}-conn.mat', t_group_conns)
 
 
 # Now do the mean of each group
@@ -47,14 +48,14 @@ markers = [
 conn_means = {x: {} for x in markers}
 
 for t_group in groups_to_consider:
-    conn_fname = db_path / f'all_conn_{run}_{t_group}-conn.mat'
+    conn_fname = out_path / f'all_conn_{run}_{t_group}-conn.mat'
     if not conn_fname.exists():
         continue
     conn = sio.loadmat(conn_fname)
     for t_marker in markers:
         conn_means[t_marker][t_group] = conn[t_marker].mean(axis=0)
 
-sio.savemat(db_path / f'all_conn_{run}_mean.mat', conn_means)
+sio.savemat(out_path / f'all_conn_{run}_mean.mat', conn_means)
 
 # Now compute the ROI - ROI connectivity
 
@@ -67,7 +68,7 @@ for t_marker in markers:
             continue
         t_conn = m_mean_conn[t_group]
         t_roi_conn = np.zeros(
-            (len(plot3d_rois), len(plot3d_rois)), dtype=np.float)
+            (len(plot3d_rois), len(plot3d_rois)), dtype=float)
         roi_names = list(plot3d_rois.keys())
         n_rois = len(roi_names)
 
@@ -85,7 +86,7 @@ for t_marker in markers:
         conn_roi_means[t_marker][t_group] = t_roi_conn
 
 
-sio.savemat(db_path / f'all_conn_{run}_roi_mean.mat', conn_roi_means)
+sio.savemat(out_path / f'all_conn_{run}_roi_mean.mat', conn_roi_means)
 
 
 # Now prepare a CSV for stats
@@ -93,7 +94,7 @@ sio.savemat(db_path / f'all_conn_{run}_roi_mean.mat', conn_roi_means)
 conn_df_elems = []
 for t_group in groups_to_consider:
     stage, mr = t_group.split('_')
-    conn_fname = db_path / f'all_conn_{run}_{t_group}-conn.mat'
+    conn_fname = out_path / f'all_conn_{run}_{t_group}-conn.mat'
     if not conn_fname.exists():
         continue
     mc = sio.loadmat(conn_fname)
@@ -104,7 +105,7 @@ for t_group in groups_to_consider:
             t_conn = mc[t_marker][i_s]
             n_pairs = len(plot3d_rois) * (len(plot3d_rois) - 1) / 2
             t_roi_conn = np.zeros(
-                (len(plot3d_rois), len(plot3d_rois)), dtype=np.float)
+                (len(plot3d_rois), len(plot3d_rois)), dtype=float)
             roi_names = list(plot3d_rois.keys())
             n_rois = len(roi_names)
 
@@ -132,4 +133,4 @@ df = pd.DataFrame(conn_df_elems)
 df = df.set_index(['Subject', 'SO', 'MR', 'Connection', 'Marker']).unstack()
 df.columns = [x[1] for x in df.columns]
 df = df.reset_index()
-df.to_csv(db_path / f'all_conn_{run}_for_stats.csv', sep=';')
+df.to_csv(out_path / f'all_conn_{run}_for_stats.csv', sep=';')

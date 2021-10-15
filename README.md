@@ -4,6 +4,7 @@
 ## Requires
 * mne-python
 * nice
+* h5py
 * nice-sandbox
 * seaborn
 * pandas
@@ -11,5 +12,4 @@
 
 ## Installing helvetica font
 
-Copy `Helvetica.ttf` to 
-`~/anaconda3/lib/python3.7/site-packages/matplotlib/mpl-data/fonts/ttf`
+Copy `Helvetica.ttf` to matplotlib's root folder `/mpl-data/fonts/ttf`

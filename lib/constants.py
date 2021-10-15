@@ -50,6 +50,7 @@ stage_groups = {
 }
 
 hori_groups = {
+    'W' : ['LG1/nmr', 'LG1/mr', 'LG3/nmr', 'LG3/mr'],
     'H0': ['Stage0', 'Stage0/mr0', 'Stage0/mr1'],
     'H1': ['Stage1', 'Stage1/mr0', 'Stage1/mr1'],
     'H2': ['Stage2', 'Stage2/mr0', 'Stage2/mr1'],
@@ -59,6 +60,7 @@ hori_groups = {
     'H6to8': ['Stage6', 'Stage6/mr0', 'Stage6/mr1',
               'Stage7', 'Stage7/mr0', 'Stage7/mr1',
               'Stage8', 'Stage8/mr0', 'Stage8/mr1'],
+    'N2' : ['N2/new', 'N2/old']
 }
 
 mr_groups = {

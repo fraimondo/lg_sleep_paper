@@ -4,13 +4,12 @@ import pandas as pd
 
 import sys
 sys.path.append('../')
-from lib.constants import stage_groups  # noqa E402
 
 
-db_path = Path('../data')
-run = '20200226_stages'
+db_path = Path('/data/group/appliedml/fraimondo/lg_meg_sleep/data/')
+run = '09092021_stages'
 
-in_path = db_path / 'subjects' / run
+in_path = db_path / 'results' / run
 
 files = list(in_path.glob('*/*_scalars.csv'))
 subjects = [f.parent.name for f in files]
@@ -25,4 +24,4 @@ all_df = all_df.set_index(
 
 all_df = all_df.reset_index()
 
-all_df.to_csv(f'../data/all_results_{run}_stages.csv', sep=';')
+all_df.to_csv(f'../data/all_results_{run}.csv', sep=';')

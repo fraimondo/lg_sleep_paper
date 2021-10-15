@@ -4,13 +4,12 @@ import pandas as pd
 
 import sys
 sys.path.append('../')
-from lib.constants import stage_groups  # noqa E402
 
 
-db_path = Path('../data')
-run = '20200226_decoding'
+db_path = Path('/data/group/appliedml/fraimondo/lg_meg_sleep/data/')
+run = '09092021_decoding'
 
-in_path = db_path / 'subjects' / run
+in_path = db_path / 'results' / run
 
 files = list(in_path.glob('*/*_epochs.csv'))
 subjects = [f.parent.name for f in files]
@@ -24,4 +23,4 @@ for t_df, t_s in zip(dfs, subjects):
 
 all_df = pd.concat(dfs)
 
-all_df.to_csv(f'../data/all_results_{run}_decoding.csv', sep=';')
+all_df.to_csv(f'../data/all_results_{run}.csv', sep=';')

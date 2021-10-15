@@ -4,28 +4,35 @@ import numpy as np
 
 from scipy import io as sio
 
-db_path = Path('../data')
-run = '20200226_stages'
 
-in_path = db_path / 'subjects' / run
+db_path = Path('/data/group/appliedml/fraimondo/lg_meg_sleep/data/')
+run = '09092021_stages'
+
+in_path = db_path / 'results' / run
 
 reductions = [
     'sleep/W/meg/trim_mean80',
-    'sleep/Group1/meg/trim_mean80',
-    'sleep/Group2/meg/trim_mean80',
-    'sleep/Group3/meg/trim_mean80',
-    'sleep/Group4/meg/trim_mean80',
-    'sleep/N2_G5/meg/trim_mean80',
+    'sleep/H1/meg/trim_mean80',
+    'sleep/H2/meg/trim_mean80',
+    'sleep/H3/meg/trim_mean80',
+    'sleep/H4/meg/trim_mean80',
+    'sleep/H5/meg/trim_mean80',
+    'sleep/H6to8/meg/trim_mean80',
+    'sleep/N2/meg/trim_mean80',
 
     # And the MR topos
     'sleep/Awake_MR0/meg/trim_mean80',
     'sleep/Awake_MR1/meg/trim_mean80',
-    'sleep/Group1_MR0/meg/trim_mean80',
-    'sleep/Group1_MR1/meg/trim_mean80',
-    'sleep/Group2_MR0/meg/trim_mean80',
-    'sleep/Group2_MR1/meg/trim_mean80',
-    'sleep/Group3_MR0/meg/trim_mean80',
-    'sleep/Group3_MR1/meg/trim_mean80'
+    'sleep/H0_MR0/meg/trim_mean80',
+    'sleep/H0_MR1/meg/trim_mean80',
+    'sleep/H1_MR0/meg/trim_mean80',
+    'sleep/H1_MR1/meg/trim_mean80',
+    'sleep/H2_MR0/meg/trim_mean80',
+    'sleep/H2_MR1/meg/trim_mean80',
+    'sleep/H3_MR0/meg/trim_mean80',
+    'sleep/H3_MR1/meg/trim_mean80',
+    'sleep/H4_MR0/meg/trim_mean80',
+    'sleep/H4_MR1/meg/trim_mean80'
 ]
 
 markers = [
@@ -70,14 +77,16 @@ for fname in files:
         continue
     for t_marker in markers:
         for t_reduction in reductions:
+            red_s_name = t_reduction.replace('sleep/', '')
             marker_idx = present_markers.index(t_marker)
-            all_topos[t_marker][t_reduction.replace('sleep/', '')].append(
+            all_topos[t_marker][red_s_name].append(
                 mc[t_reduction][marker_idx][:, 0])
 
 for t_marker in markers:
     for t_reduction in reductions:
-        all_topos[t_marker][t_reduction.replace('sleep/', '')] = np.array(
-            all_topos[t_marker][t_reduction.replace('sleep/', '')])
+        red_s_name = t_reduction.replace('sleep/', '')
+        all_topos[t_marker][red_s_name] = np.array(  # type: ignore
+            all_topos[t_marker][red_s_name])
 
 
-sio.savemat(f'../data/all_results_{run}_stages_topos.mat', all_topos)
+sio.savemat(f'../data/all_results_{run}_topos.mat', all_topos)

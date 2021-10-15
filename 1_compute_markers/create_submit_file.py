@@ -29,9 +29,10 @@ log_dir = Path(cwd) / 'logs' / 'compute_markers'
 log_dir.mkdir(exist_ok=True, parents=True)
 
 
-exec_string = (f'compute_markers_{markers}.py ',
-               f'--runid {runid}_{markers} ',
-               f'--path {in_path.as_posix()} ',
+exec_string = (f'compute_markers_{markers}.py '
+               f'--runid {runid}_{markers} '
+               f'--path {in_path.as_posix()} '
+               f'--out_path {out_path.as_posix()} '
                '--subject $(subject)')
 
 preamble = f"""
@@ -62,8 +63,8 @@ error          = {log_dir.as_posix()}/$(log_fname).err
 submit_fname = f'compute_markers_{markers}.submit'
 
 with open(submit_fname, 'w') as submit_file:
+    submit_file.write(preamble)
     for t_subject in subjects:
-        submit_file.write(preamble)
         submit_file.write(f'subject={t_subject}\n')
         submit_file.write(
             f'log_fname=computer_markers_{markers}_{t_subject}\n')
