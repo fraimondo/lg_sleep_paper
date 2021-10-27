@@ -12,9 +12,11 @@ from lib.utils import clf_maps  # noqa
 sns.set_context('paper', rc={'font.size': 12, 'axes.labelsize': 12,
                              'lines.linewidth': .5,
                              'xtick.labelsize': 10, 'ytick.labelsize': 10})
-sns.set_style('white',
+sns.set_style('whitegrid',
               {'font.sans-serif': ['Helvetica'],
                'pdf.fonttype': 42,
+               'grid.linestyle': ':',
+               'grid.linewidth': 0.5,
                'axes.edgecolor': '.8'})
 
 mpl.rcParams.update({'font.weight': 'ultralight'})
@@ -23,8 +25,7 @@ current_palette = sns.color_palette()
 
 # periods = ['pre', 'post', 'all']
 # periods = ['pre', 'post']
-# periods = ['pre', 'post']
-periods = ['pre']
+periods = ['pre', 'post']
 # classifiers = ['et-reduced', 'gssvm']
 classifiers = ['et-reduced']
 
@@ -56,15 +57,15 @@ for t_period in periods:
 bs_df = pd.concat(all_df_bs)
 cv_df = pd.concat(all_df_cv)
 
-bs_df = bs_df[bs_df['SO_train'].isin(_d_names.keys())]
+bs_df = bs_df[bs_df['SO_train'].isin(_d_names.keys())]  # type: ignore
 bs_df = bs_df[bs_df['SO_test'].isin(_d_names.keys())]
 
-cv_df = cv_df[cv_df['SO'].isin(_d_names.keys())]
+cv_df = cv_df[cv_df['SO'].isin(_d_names.keys())]  # type: ignore
 
-dummy_df_bs = bs_df.query(f"Classifier == 'dummy'")
+dummy_df_bs = bs_df.query("Classifier == 'dummy'")
 dummy_df_bs = dummy_df_bs[['SO_train', 'SO_test', 'BS', 'Period', 'AUC']]
 
-dummy_df_cv = cv_df.query(f"Classifier == 'dummy'")
+dummy_df_cv = cv_df.query("Classifier == 'dummy'")
 dummy_df_cv = dummy_df_cv[['SO', 'Fold', 'Period', 'AUC']]
 
 
@@ -134,7 +135,7 @@ for t_period in periods:
                 else:
                     sns.swarmplot(
                         x=None, y=t_df['AUC'], color='gray',
-                        ax=t_ax, alpha=.5, size=1
+                        ax=t_ax, alpha=.5, size=0.5
                     )
                     sns.boxplot(
                         y=t_df['AUC'].values,
@@ -200,6 +201,7 @@ for t_period in periods:
             t_ax_stats.set_xlim(-0.05, 0.5)
             # t_ax.set_xtick
             t_ax_stats.axvline(0, color='gray', ls=':')
+            t_ax_stats.yaxis.grid(False)
             for flier in bpl['fliers']:
                 ypos = flier.get_xydata()[:, 1]
                 ypos += (np.random.random_sample((ypos.shape)) * 0.4 - 0.2)
@@ -218,7 +220,8 @@ for t_period in periods:
             wspace=0.06
         )
         fig_swarm.savefig(
-            f'../figures/decoding/cross_{clf_name}_{t_period}_balanced.png', dpi=300)
+            f'../figures/decoding/cross_{clf_name}_{t_period}_balanced.png',
+            dpi=300)
         fig_swarm.savefig(
             f'../figures/decoding/cross_{clf_name}_{t_period}_balanced.pdf')
         plt.close(fig_swarm)
@@ -231,12 +234,13 @@ for t_period in periods:
             hspace=0.2,
             wspace=0.075
         )
+        axes_stats[0].set_yticks(range(1, len(order) + 1))
         axes_stats[0].set_yticklabels(
             [_d_names[x] for x in reversed(order)],
             fontdict={'horizontalalignment': 'center'})
         axes_stats[0].tick_params(axis='y', pad=25)
         axes_stats[0].annotate(
-            f'AUC (Model-Dummy)',
+            'AUC (Model-Dummy)',
             xy=(0.5, 0.08),
             xycoords='figure fraction',
             annotation_clip=False,
@@ -245,8 +249,10 @@ for t_period in periods:
         )
 
         fig_stats.savefig(
-            f'../figures/decoding/cross_{clf_name}_{t_period}_balanced_stats.png',
+            (f'../figures/decoding/cross_{clf_name}_{t_period}'
+             '_balanced_stats.png'),
             dpi=300)
         fig_stats.savefig(
-            f'../figures/decoding/cross_{clf_name}_{t_period}_balanced_stats.pdf')
+            (f'../figures/decoding/cross_{clf_name}_{t_period}'
+             '_balanced_stats.pdf'))
         plt.close(fig_stats)

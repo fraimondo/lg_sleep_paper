@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 import numpy as np
 import math
@@ -12,9 +13,6 @@ from mne.surface import _reorder_ccw
 from mne.transforms import apply_trans, _pol_to_cart, _cart_to_sph
 
 import bezier
-
-from mayavi import mlab
-from mayavi.api import OffScreenEngine
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
@@ -22,7 +20,18 @@ import sys
 sys.path.append('../')
 from lib.constants import stage_groups, mr_groups, plot3d_rois  # noqa
 
-out_run = '20200226_connectivity'
+
+
+os.environ['ETS_TOOLKIT'] = 'qt4'
+os.environ['QT_API'] = 'pyqt5'
+
+from mayavi import mlab
+from mayavi.api import OffScreenEngine
+
+
+mne.viz.set_3d_backend('mayavi')
+
+out_run = '09092021_connectivity'
 
 marker = 'nice_marker_SymbolicMutualInformation_theta_weighted'
 # marker = 'nice_marker_SymbolicMutualInformation_alpha_weighted'
@@ -48,13 +57,13 @@ events = mne.read_events(event_fname)
 # Each one of this defines a figure to make. Each figure has it's own scale
 figure_groups = {
     'MR': [
-        'Group1_MR0', 'Group2_MR0', 'Group3_MR0', 'Group4_MR0', 'Group5_MR0',
-        'Group1_MR1', 'Group2_MR1', 'Group3_MR1', 'Group4_MR1', 'Group5_MR1'],
-    'Group1MR': ['Group1_MR0', 'Group1_MR1'],
-    'Group2MR': ['Group2_MR0', 'Group2_MR1'],
-    'Group3MR': ['Group3_MR0', 'Group3_MR1'],
-    'Group4MR': ['Group4_MR0', 'Group4_MR1'],
-    'Group5MR': ['Group5_MR0', 'Group5_MR1'],
+        'H1_MR0', 'H2_MR0', 'H3_MR0', 'H4_MR0', 'H5_MR0',
+        'H1_MR1', 'H2_MR1', 'H3_MR1', 'H4_MR1', 'H5_MR1'],
+    'H1MR': ['H1_MR0', 'H1_MR1'],
+    'H2MR': ['H2_MR0', 'H2_MR1'],
+    'H3MR': ['H3_MR0', 'H3_MR1'],
+    'H4MR': ['H4_MR0', 'H4_MR1'],
+    'H5MR': ['H5_MR0', 'H5_MR1'],
 }
 
 engine = None
@@ -228,21 +237,20 @@ for fgroup_name, fgroup_items in figure_groups.items():
         y = np.hstack(all_y)
         z = np.hstack(all_z)
         s = np.hstack(all_s)
-        connections = np.vstack(all_connections)
+        connections = np.vstack(all_connections).astype(int)
         with warnings.catch_warnings(record=True):  # traits
             # Create the points
             src = mlab.pipeline.scalar_scatter(x, y, z, s, figure=fig)
 
-            # Connect them
+            # # Connect them
             src.mlab_source.dataset.lines = connections
             src.update()
-
             # The stripper filter cleans up connected lines
-            lines = mlab.pipeline.stripper(src, figure=fig)
+            # lines = mlab.pipeline.stripper(src, figure=fig)
 
-            # Finally, display the set of lines
+            # # Finally, display the set of lines
             mlab.pipeline.surface(
-                lines, colormap='viridis', line_width=8.,
+                src, colormap='viridis', line_width=8.,
                 opacity=0.7,
                 vmin=0,
                 vmax=1.0,

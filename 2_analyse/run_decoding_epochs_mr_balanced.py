@@ -2,6 +2,7 @@ from pathlib import Path
 import time
 import numpy as np
 import pandas as pd
+from pathlib import Path
 
 from argparse import ArgumentParser
 
@@ -28,6 +29,9 @@ args = parser.parse_args()
 group_train = args.train
 group_test = args.test
 period = args.period
+
+out_dir = Path('../stats/balanced_decoding')
+out_dir.mkdir(exist_ok=True, parents=True)
 
 valid_groups = [f'H{x}' for x in range(1, 6)] + ['Awake', 'H6to8']
 
@@ -121,7 +125,7 @@ elapsed = time.strftime(
 print(f'Total time for {group_train} - {group_test} was {elapsed}')
 cross_so_df = pd.concat(cross_so_results)
 cross_so_df.to_csv(
-    (f'../stats/results_decoding_balanced_{period}_cross_so_'
+    (out_dir / f'results_decoding_balanced_{period}_cross_so_'
         f'{group_train}_{group_test}.csv'),
     sep=';')
 

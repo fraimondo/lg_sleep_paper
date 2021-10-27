@@ -9,9 +9,12 @@ import sys
 sys.path.append('../')
 from lib.utils import _map_key_to_text, compute_ci, clf_maps  # noqa
 
-sns.set_context('paper', rc={'font.size': 12, 'axes.labelsize': 12,
+sns.set_context('paper', rc={'font.size': 12,
+                             'axes.labelsize': 12,
                              'lines.linewidth': .5,
-                             'xtick.labelsize': 8, 'ytick.labelsize': 10})
+                             'xtick.labelsize': 8,
+                             'ytick.labelsize': 8,
+                             'ytick.minor.pad': -2})
 sns.set_style('white',
               {'font.sans-serif': ['Helvetica'],
                'pdf.fonttype': 42,
@@ -62,9 +65,6 @@ for t_period in periods:
     fig_short, axes_short = plt.subplots(
         1, len(_d_names), sharex=True, figsize=(10, n_to_plot * 0.4))
 
-    fig_long, axes_long = plt.subplots(
-        1, len(_d_names), sharex=True, figsize=(10, 7))
-
     for i, (t_group, t_title) in enumerate(_d_names.items()):
         t_ax = axes_short[i]
         t_df = fi_df.query(f"SO == '{t_group}'")
@@ -87,6 +87,7 @@ for t_period in periods:
             # xerr=err,
             color=t_colors
         )
+        t_ax.tick_params(axis='y', pad=-4)
         t_ax.set_yticks(list(range(len(t_plot_markers))))
         t_ax.set_yticklabels(reversed(t_plot_markers))
         t_ax.set_title(t_title)

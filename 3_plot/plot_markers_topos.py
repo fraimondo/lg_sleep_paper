@@ -32,7 +32,7 @@ current_palette = sns.color_palette()
 run = '09092021_stages'
 
 
-subjects = ['s01', 's02', 's05', 's06', 's07', 's08', 's09', 's10', 's11',
+subjects = ['s01', 's02', 's05', 's06', 's08', 's09', 's10', 's11',
             's15', 's16', 's17', 's21', 's23', 's24', 's25', 's26',
             's28', 's29', 's30', 's31']
 

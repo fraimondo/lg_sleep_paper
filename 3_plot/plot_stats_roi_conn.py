@@ -26,13 +26,15 @@ mpl.rcParams.update({'font.weight': 'ultralight'})
 sns.set_color_codes()
 current_palette = sns.color_palette()
 
-groups = [f'Group{x}' for x in range(1, 5)]
+groups = [f'H{x}' for x in range(1, 6)] + ['H6to8']
 
 group_labels = [
-    r"D1" + "\n" + r"(alpha)",
-    r"D2" + "\n" + r"(flattening)",
-    r"D3" + "\n" + r"(theta)",
-    r"D4" + "\n" + r"(sharp waves)"
+    r"H1",
+    r"H2",
+    r"H3",
+    r"H4",
+    r"H5",
+    r"H6-8"
 ]
 
 roi_names = list(plot3d_rois.keys())
@@ -41,6 +43,7 @@ n_groups = len(groups)
 markers = {
     r'wSMI alpha': '../stats/stats_conn_posthoc_wsmialpha.csv',
     r'wSMI theta': '../stats/stats_conn_posthoc_wsmitheta.csv',
+    r'wSMI theta/alpha': '../stats/stats_conn_posthoc_wsmithetaalpha.csv',
 }
 
 
@@ -92,6 +95,6 @@ for t_marker, t_fname in markers.items():
                          'p={}'.format(stat_psig),
                          'p={}'.format(stat_pvmax)])
     fig.suptitle(t_marker)
-    mname = t_marker.replace('$', '').replace('\\', '')
+    mname = t_marker.replace('$', '').replace('\\', '').replace('/', '_')
     fig.savefig(f'../figures/conn/conn_stats_{mname}.pdf')
-    fig.savefig(f'../figures/conn/conn_stats_{mname}.png')
+    fig.savefig(f'../figures/conn/conn_stats_{mname}.png', dpi=300)

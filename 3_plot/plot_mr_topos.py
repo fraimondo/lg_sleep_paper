@@ -5,7 +5,7 @@ from scipy import io as sio
 from scipy.stats import ttest_rel
 
 import mne
-from mne.channels import find_ch_connectivity
+from mne.channels import find_ch_adjacency
 from mne.stats import permutation_cluster_1samp_test
 from mne.viz.topomap import plot_topomap
 
@@ -32,7 +32,7 @@ mpl.rcParams.update({'font.weight': 'ultralight'})
 sns.set_color_codes()
 current_palette = sns.color_palette()
 
-run = '20200226_stages'
+run = '09092021_stages'
 
 
 subjects = ['s01', 's02', 's05', 's06', 's07', 's08', 's09', 's10', 's11',
@@ -40,14 +40,11 @@ subjects = ['s01', 's02', 's05', 's06', 's07', 's08', 's09', 's10', 's11',
             's28', 's29', 's30', 's31']
 
 
-groups = ['Awake', 'Group1', 'Group2', 'Group3']
+groups = ['Awake', 'H1', 'H2', 'H3', 'H4', 'H5']
 
-_group_maps = {
-    'Awake': 'Awake',
-    'Group1': r"D1" + "\n" + r"(alpha)",
-    'Group2': r"D2" + "\n" + r"(flattening)",
-    'Group3': r"D3" + "\n" + r"(theta)"
-}
+_group_labels = ['Awake', r"H1", r"H2", r"H3", r"H4", r"H5"]
+
+_group_maps = {k: v for k, v in zip(groups, _group_labels)}
 
 markers = [
     # 'nice/marker/PermutationEntropy/theta',
@@ -68,7 +65,7 @@ stat_sig = -np.log10(0.05)
 stat_cmap = utils.get_stat_colormap(stat_sig, stat_vmin, stat_vmax)
 
 prefix = 'pre'
-all_topos = sio.loadmat(f'../data/all_results_{run}_stages_topos.mat')
+all_topos = sio.loadmat(f'../data/all_results_{run}_mr_topos.mat')
 
 info = utils._get_info()
 
@@ -103,13 +100,12 @@ for to_plot in ['grad', 'mag']:
                 t_mr1_data = mr1_data[:, t_picks]
 
             _, t_p_vals = ttest_rel(t_mr0_data, t_mr1_data)
-            connectivity, ch_names = find_ch_connectivity(
+            adjacency, ch_names = find_ch_adjacency(
                 info, ch_type='mag')
 
             t_obs, clusters, cluster_pv, H0 = permutation_cluster_1samp_test(
-                t_mr0_data - t_mr1_data,
-                n_permutations='all',
-                connectivity=connectivity)
+                t_mr0_data - t_mr1_data, out_type='mask',
+                n_permutations='all', adjacency=adjacency)
             c_idx = None
             if len(cluster_pv) > 0:
                 c_idx = np.argmin(cluster_pv)

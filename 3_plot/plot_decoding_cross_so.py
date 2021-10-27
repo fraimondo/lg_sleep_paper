@@ -55,15 +55,15 @@ for t_period in periods:
 bs_df = pd.concat(all_df_bs)
 cv_df = pd.concat(all_df_cv)
 
-bs_df = bs_df[bs_df['SO_train'].isin(_d_names.keys())]
-bs_df = bs_df[bs_df['SO_test'].isin(_d_names.keys())]
+bs_df = bs_df[bs_df['SO_train'].isin(_d_names.keys())]  # type: ignore
+bs_df = bs_df[bs_df['SO_test'].isin(_d_names.keys())]  # type: ignore
 
-cv_df = cv_df[cv_df['SO'].isin(_d_names.keys())]
+cv_df = cv_df[cv_df['SO'].isin(_d_names.keys())]  # type: ignore
 
-dummy_df_bs = bs_df.query(f"Classifier == 'dummy'")
+dummy_df_bs = bs_df.query("Classifier == 'dummy'")
 dummy_df_bs = dummy_df_bs[['SO_train', 'SO_test', 'BS', 'Period', 'AUC']]
 
-dummy_df_cv = cv_df.query(f"Classifier == 'dummy'")
+dummy_df_cv = cv_df.query("Classifier == 'dummy'")
 dummy_df_cv = dummy_df_cv[['SO', 'Fold', 'Period', 'AUC']]
 
 
@@ -133,7 +133,7 @@ for t_period in periods:
                 else:
                     sns.swarmplot(
                         x=None, y=t_df['AUC'], color='gray',
-                        ax=t_ax, alpha=.5, size=1
+                        ax=t_ax, alpha=.5, size=0.5
                     )
                     sns.boxplot(
                         y=t_df['AUC'].values,
@@ -230,12 +230,13 @@ for t_period in periods:
             hspace=0.2,
             wspace=0.075
         )
+        axes_stats[0].set_yticks(range(1, len(order) + 1))
         axes_stats[0].set_yticklabels(
             [_d_names[x] for x in reversed(order)],
             fontdict={'horizontalalignment': 'center'})
         axes_stats[0].tick_params(axis='y', pad=25)
         axes_stats[0].annotate(
-            f'AUC (Model-Dummy)',
+            'AUC (Model-Dummy)',
             xy=(0.5, 0.08),
             xycoords='figure fraction',
             annotation_clip=False,

@@ -1,3 +1,6 @@
+import pathlib
+from matplotlib.pyplot import table
+from numpy import e
 import pandas as pd
 
 import sys
@@ -11,20 +14,24 @@ periods = ['pre', 'post']
 # classifiers = ['et-reduced', 'gssvm']
 classifiers = ['et-reduced', 'dummy']
 
-_so_names = {
-    'Awake': r"Awake",
-    'Group1': r"D1 (alpha)",
-    'Group2': r"D2 (flattening)",
-    'Group3': r"D3 (theta)",
+_d_names = {
+    'Awake': r"W",
+    'H1': r"H1",
+    'H2': r"H2",
+    'H3': r"H3",
+    'H4': r"H4",
+    'H5': r"H5",
 }
 
-order = ['Awake', 'Group1', 'Group2', 'Group3']
+order = ['Awake', 'H1', 'H2', 'H3', 'H4', 'H5']
 
-# MR+/MR- Decoding by Dstage (CV)
+
+# MR+/MR- Decoding by Hori stage (CV)
 
 all_df_cv = []
 for t_period in periods:
-    t_df = pd.read_csv(f'../stats/results_decoding_{t_period}_cv.csv', sep=';')
+    t_df = pd.read_csv(
+        f'../stats/results_decoding_{t_period}_cv.csv', sep=';')
     t_df['Period'] = t_period
     all_df_cv.append(t_df)
 
@@ -48,7 +55,7 @@ for t_class in classifiers:
                 f'Period == "{t_period}"')['AUC'].values
             m, cil, ciu = compute_ci(vals)
             cv_stats['Classifier'].append(t_class)
-            cv_stats['SO'].append(_so_names[t_stage])
+            cv_stats['SO'].append(_d_names[t_stage])
             cv_stats['Period'].append(t_period)
             cv_stats['Mean AUC'].append(m)
             cv_stats['CI L'].append(cil)
@@ -90,7 +97,7 @@ for t_class in classifiers:
                 f'Period == "{t_period}"')['diff'].values
             m, cil, ciu = compute_ci(vals, isbootstrap=False)
             cv_diff_stats['Classifier'].append(t_class)
-            cv_diff_stats['SO'].append(_so_names[t_stage])
+            cv_diff_stats['SO'].append(_d_names[t_stage])
             cv_diff_stats['Period'].append(t_period)
             cv_diff_stats['Diff AUC'].append(m)
             cv_diff_stats['CI L'].append(cil)
@@ -123,7 +130,7 @@ for t_class in classifiers:
                 f'Period == "{t_period}"')['diff'].values
             m, cil, ciu = compute_ci(vals, isbootstrap=False)
             cv_diff_stats['Classifier'].append(t_class)
-            cv_diff_stats['SO'].append(_so_names[t_stage])
+            cv_diff_stats['SO'].append(_d_names[t_stage])
             cv_diff_stats['Period'].append(t_period)
             cv_diff_stats['Diff AUC'].append(m)
             cv_diff_stats['CI L'].append(cil)
@@ -137,11 +144,14 @@ print(cv_diff_stats)
 
 # MR+/MR- Decoding across Dstage
 all_df_bs = []
+balanced_path = pathlib.Path('../stats/balanced_decoding')
 for t_period in periods:
-    t_df = pd.read_csv(
-        f'../stats/results_decoding_{t_period}_cross_so.csv', sep=';')
-    t_df['Period'] = t_period
-    all_df_bs.append(t_df)
+    fnames = balanced_path.glob(
+        f'results_decoding_balanced_{t_period}_cross_so*.csv')
+    for fname in fnames:
+        t_df = pd.read_csv(fname, sep=';')
+        t_df['Period'] = t_period
+        all_df_bs.append(t_df)
 
 
 bs_df = pd.concat(all_df_bs)
@@ -168,8 +178,8 @@ for t_class in classifiers:
                     f'Period == "{t_period}"')['AUC'].values
                 m, cil, ciu = compute_ci(vals)
                 bs_stats['Classifier'].append(t_class)
-                bs_stats['SO_train'].append(_so_names[t_train])
-                bs_stats['SO_test'].append(_so_names[t_test])
+                bs_stats['SO_train'].append(_d_names[t_train])
+                bs_stats['SO_test'].append(_d_names[t_test])
                 bs_stats['Period'].append(t_period)
                 bs_stats['Mean AUC'].append(m)
                 bs_stats['CI L'].append(cil)
@@ -218,8 +228,8 @@ for t_class in classifiers:
                     f'Period == "{t_period}"')['diff'].values
                 m, cil, ciu = compute_ci(vals)
                 bs_diff_stats['Classifier'].append(t_class)
-                bs_diff_stats['SO_train'].append(_so_names[t_train])
-                bs_diff_stats['SO_test'].append(_so_names[t_test])
+                bs_diff_stats['SO_train'].append(_d_names[t_train])
+                bs_diff_stats['SO_test'].append(_d_names[t_test])
                 bs_diff_stats['Period'].append(t_period)
                 bs_diff_stats['Diff AUC'].append(m)
                 bs_diff_stats['CI L'].append(cil)
@@ -271,8 +281,8 @@ for t_class in classifiers:
                     vals = t_df.query(f'MR == "{t_mr}"')['AUC'].values
                     m, cil, ciu = compute_ci(vals, isbootstrap=False)
                     mr_cv_stats['Classifier'].append(t_class)
-                    mr_cv_stats['SOa'].append(_so_names[ta])
-                    mr_cv_stats['SOb'].append(_so_names[tb])
+                    mr_cv_stats['SOa'].append(_d_names[ta])
+                    mr_cv_stats['SOb'].append(_d_names[tb])
                     mr_cv_stats['MR'].append(t_mr)
                     mr_cv_stats['Period'].append(t_period)
                     mr_cv_stats['Mean AUC'].append(m)
@@ -325,8 +335,8 @@ for t_class in classifiers:
                         f'MR == "{t_mr}"')['diff'].values
                     m, cil, ciu = compute_ci(vals, isbootstrap=False)
                     mr_cv_diff_stats['Classifier'].append(t_class)
-                    mr_cv_diff_stats['SOa'].append(_so_names[ta])
-                    mr_cv_diff_stats['SOb'].append(_so_names[tb])
+                    mr_cv_diff_stats['SOa'].append(_d_names[ta])
+                    mr_cv_diff_stats['SOb'].append(_d_names[tb])
                     mr_cv_diff_stats['MR'].append(t_mr)
                     mr_cv_diff_stats['Period'].append(t_period)
                     mr_cv_diff_stats['Diff AUC'].append(m)
@@ -338,3 +348,79 @@ print('\n====================================================================')
 print('Models - Dummy')
 print('====================================================================\n')
 print(mr_cv_diff_stats)
+
+
+table_order = [_d_names[x] for x in order]
+
+print('\n====================================================================')
+print('Table S4 - AUC in PRE')
+print('====================================================================\n')
+t_cv_stats = cv_stats.query('Period == "pre" and Classifier == "et-reduced"')
+t_bs_stats = bs_stats.query('Period == "pre" and Classifier == "et-reduced"')
+t_header = ''
+for h in table_order[1:]:
+    t_header += f'{h}\t'
+print(t_header)
+for test in table_order:
+    t_row = ''
+    for train in table_order:
+        if train == test:
+            t_vals = t_cv_stats.query(f'SO == "{train}"')
+        else:
+            t_vals = t_bs_stats.query(
+                f'SO_train == "{train}" and SO_test == "{test}"')
+        t_auc = t_vals['Mean AUC'].values[0]
+        t_ci_l = t_vals['CI L'].values[0]
+        t_ci_u = t_vals['CI U'].values[0]
+        t_row += f'{t_auc:.2f} [{t_ci_l:.2f}, {t_ci_u:.2f}]\t'
+    print(t_row)
+
+
+print('\n====================================================================')
+print('Table S5 - AUC in POST')
+print('====================================================================\n')
+t_cv_stats = cv_stats.query('Period == "post" and Classifier == "et-reduced"')
+t_bs_stats = bs_stats.query('Period == "post" and Classifier == "et-reduced"')
+t_header = ''
+for h in table_order:
+    t_header += f'{t_header}\t'
+
+for test in table_order:
+    t_row = ''
+    for train in table_order:
+        if train == test:
+            t_vals = t_cv_stats.query(f'SO == "{train}"')
+        else:
+            t_vals = t_bs_stats.query(
+                f'SO_train == "{train}" and SO_test == "{test}"')
+        t_auc = t_vals['Mean AUC'].values[0]
+        t_ci_l = t_vals['CI L'].values[0]
+        t_ci_u = t_vals['CI U'].values[0]
+        t_row += f'{t_auc:.2f} [{t_ci_l:.2f}, {t_ci_u:.2f}]\t'
+    print(t_row)
+
+for t_mr in ['Both', 'MR+', 'MR-']:
+
+    print('\n================================================================'
+          '====')
+    print(f'Table S6-8 - Stage decoding AUC in PRE ({t_mr})')
+    print('=================================================================='
+          '==\n')
+    t_cv_stats = mr_cv_stats.query(
+        f'Period == "pre" and Classifier == "et-reduced" and MR == "{t_mr}"')
+    t_header = '\t'
+    for h in table_order:
+        t_header += f'{t_header}\t'
+
+    for stage1 in table_order:
+        t_row = f'{stage1}\t'
+        for stage2 in table_order[1:]:
+            t_vals = t_cv_stats.query(f'SOa == "{stage1}" and SOb == "{stage2}"')
+            if len(t_vals) == 0:
+                t_row += '\t'
+            else:
+                t_auc = t_vals['Mean AUC'].values[0]
+                t_ci_l = t_vals['CI L'].values[0]
+                t_ci_u = t_vals['CI U'].values[0]
+                t_row += f'{t_auc:.2f} [{t_ci_l:.2f}, {t_ci_u:.2f}]\t'
+        print(t_row)
