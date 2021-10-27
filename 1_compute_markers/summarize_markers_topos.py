@@ -5,12 +5,12 @@ import numpy as np
 from scipy import io as sio
 
 
-db_path = Path('/data/group/appliedml/fraimondo/lg_meg_sleep/data/')
+db_path = Path('/data/project/lg_meg_sleep/data')
 run = '09092021_stages'
 
 in_path = db_path / 'results' / run
 
-reductions = [
+nomr_reductions = [
     'sleep/W/meg/trim_mean80',
     'sleep/H1/meg/trim_mean80',
     'sleep/H2/meg/trim_mean80',
@@ -19,12 +19,12 @@ reductions = [
     'sleep/H5/meg/trim_mean80',
     'sleep/H6to8/meg/trim_mean80',
     'sleep/N2/meg/trim_mean80',
+]
 
+mr_reductions = [
     # And the MR topos
     'sleep/Awake_MR0/meg/trim_mean80',
     'sleep/Awake_MR1/meg/trim_mean80',
-    'sleep/H0_MR0/meg/trim_mean80',
-    'sleep/H0_MR1/meg/trim_mean80',
     'sleep/H1_MR0/meg/trim_mean80',
     'sleep/H1_MR1/meg/trim_mean80',
     'sleep/H2_MR0/meg/trim_mean80',
@@ -32,7 +32,10 @@ reductions = [
     'sleep/H3_MR0/meg/trim_mean80',
     'sleep/H3_MR1/meg/trim_mean80',
     'sleep/H4_MR0/meg/trim_mean80',
-    'sleep/H4_MR1/meg/trim_mean80'
+    'sleep/H4_MR1/meg/trim_mean80',
+    'sleep/H5_MR0/meg/trim_mean80',
+    'sleep/H5_MR1/meg/trim_mean80',
+
 ]
 
 markers = [
@@ -63,30 +66,36 @@ markers = [
     'nice/marker/PowerSpectralDensity/highgamma',
 ]
 
-files = in_path.glob('*/*_topos.mat')
+all_reductions = {
+    'topos': nomr_reductions,
+    'mr_topos': mr_reductions
+}
 
-all_topos = {x: {y.replace('sleep/', ''): [] for y in reductions}
-             for x in markers}
+for t_name, t_reductions in all_reductions.items():
+    all_topos = {x: {y.replace('sleep/', ''): [] for y in t_reductions}
+                 for x in markers}
+    good_subjects = []
+    for fname in in_path.glob('*/*_topos.mat'):
+        subject = fname.parent.name
+        mc = sio.loadmat(fname)
+        present_markers = [x.strip() for x in mc['names']]
+        missing_reductions = [x for x in t_reductions if x not in mc]
+        if len(missing_reductions) > 0:
+            print(f'{subject}: \n\t missing reductions {missing_reductions}')
+            continue
+        good_subjects.append(subject)
+        for t_marker in markers:
+            for t_reduction in t_reductions:
+                red_s_name = t_reduction.replace('sleep/', '')
+                marker_idx = present_markers.index(t_marker)
+                all_topos[t_marker][red_s_name].append(
+                    mc[t_reduction][marker_idx][:, 0])
 
-for fname in files:
-    subject = fname.parent.name
-    mc = sio.loadmat(fname)
-    present_markers = [x.strip() for x in mc['names']]
-    missing_reductions = [x for x in reductions if x not in mc]
-    if len(missing_reductions) > 0:
-        continue
     for t_marker in markers:
-        for t_reduction in reductions:
+        for t_reduction in t_reductions:
             red_s_name = t_reduction.replace('sleep/', '')
-            marker_idx = present_markers.index(t_marker)
-            all_topos[t_marker][red_s_name].append(
-                mc[t_reduction][marker_idx][:, 0])
+            all_topos[t_marker][red_s_name] = np.array(  # type: ignore
+                all_topos[t_marker][red_s_name])
+    print(f'{t_name}: {len(good_subjects)} good subjects')
+    sio.savemat(f'../data/all_results_{run}_{t_name}.mat', all_topos)
 
-for t_marker in markers:
-    for t_reduction in reductions:
-        red_s_name = t_reduction.replace('sleep/', '')
-        all_topos[t_marker][red_s_name] = np.array(  # type: ignore
-            all_topos[t_marker][red_s_name])
-
-
-sio.savemat(f'../data/all_results_{run}_topos.mat', all_topos)

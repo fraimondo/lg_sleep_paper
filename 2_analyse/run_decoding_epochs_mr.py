@@ -69,7 +69,7 @@ if do_cv is True:
             f"SO == '{t_group}'")[markers + ['MR']]
 
         X = to_decode[markers].values
-        y = (to_decode['MR'].values == 'MR+').astype(np.int)
+        y = (to_decode['MR'].values == 'MR+').astype(int)  # type: ignore
         cv = RepeatedStratifiedKFold(n_splits=10, n_repeats=10,
                                      random_state=42)
 
@@ -106,7 +106,8 @@ if do_cross_so is True:
         # full_estimators[t_group]['gssvm'] = get_model('gssvm')
         full_estimators[t_group]['et-reduced'] = get_model('et-reduced')
         full_estimators[t_group]['dummy'] = get_model('dummy')
-        full_estimators[t_group]['dummy-negative'] = get_model('dummy-negative')
+        full_estimators[t_group][
+            'dummy-negative'] = get_model('dummy-negative')
 
     # Train all
     for t_group_fit in groups:
@@ -114,7 +115,7 @@ if do_cross_so is True:
         print(f'Training {t_group_fit}')
         to_train = final_df.query(f"SO == '{t_group_fit}'")[markers + ['MR']]
         X_train = to_train[markers].values
-        y_train = (to_train['MR'].values == 'MR+').astype(np.int)
+        y_train = (to_train['MR'].values == 'MR+').astype(int)  # type: ignore
 
         for clf_name, clf in full_estimators[t_group_fit].items():
             start_clf = time.time()
@@ -134,7 +135,8 @@ if do_cross_so is True:
             to_test = final_df.query(
                 f"SO == '{t_group_test}'")[markers + ['MR']]
             X_test = to_test[markers].values
-            y_test = (to_test['MR'].values == 'MR+').astype(np.int)
+            y_test = (
+                to_test['MR'].values == 'MR+').astype(int)  # type: ignore
 
             for clf_name, clf in full_estimators[t_group_fit].items():
                 start_clf = time.time()
@@ -171,7 +173,7 @@ if do_feat_importance is True:
         print(f'Training {t_group}')
         to_train = final_df.query(f"SO == '{t_group}'")[markers + ['MR']]
         X_train = to_train[markers].values
-        y_train = (to_train['MR'].values == 'MR+').astype(np.int)
+        y_train = (to_train['MR'].values == 'MR+').astype(int)  # type: ignore
         # Bootstrap on the training set
         bs = get_bootstrap(y_train, n_bootstrap)
         for i_bs, (bs_inds0, bs_inds1, y_bs) in enumerate(bs):
@@ -180,7 +182,7 @@ if do_feat_importance is True:
             elapsed = time.strftime(
                 '%M:%S', time.gmtime(time.time() - start_clf))
             print(f'Training et-reduced took {elapsed}')
-            clf = model.steps[1][1]
+            clf = model.steps[1][1]  # type: ignore
             t_f_i = {
                 'Importance': clf.feature_importances_,
                 'Marker': markers,
