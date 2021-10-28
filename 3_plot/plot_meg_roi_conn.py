@@ -33,8 +33,8 @@ mne.viz.set_3d_backend('mayavi')
 
 out_run = '09092021_connectivity'
 
-marker = 'nice_marker_SymbolicMutualInformation_theta_weighted'
-# marker = 'nice_marker_SymbolicMutualInformation_alpha_weighted'
+# marker = 'nice_marker_SymbolicMutualInformation_theta_weighted'
+marker = 'nice_marker_SymbolicMutualInformation_alpha_weighted'
 results_file = Path('../data') / f'all_conn_{out_run}_roi_mean.mat'
 
 data_path = Path(sample.data_path())
@@ -64,6 +64,7 @@ figure_groups = {
     'H3MR': ['H3_MR0', 'H3_MR1'],
     'H4MR': ['H4_MR0', 'H4_MR1'],
     'H5MR': ['H5_MR0', 'H5_MR1'],
+    'H6to8MR': ['H6to8_MR0', 'H6to8_MR1'],
 }
 
 engine = None

@@ -46,6 +46,16 @@ markers = {
     r'wSMI theta/alpha': '../stats/stats_conn_posthoc_wsmithetaalpha.csv',
 }
 
+_short_names = {
+'Front Right': 'FR',
+'Front Left': 'FL', 
+'Temporal Left': 'TL',
+'Temporal Right': 'TR',
+'Parietal Left': 'PL',
+'Parietal Right': 'PR',
+'Occipital Left': 'OL',
+'Occipital Right': 'OR'
+}
 
 stat_psig = 0.05
 stat_logpsig = -np.log10(stat_psig)
@@ -82,7 +92,8 @@ for t_marker, t_fname in markers.items():
         t_ax.set_xticks(ticks[:-1] + 0.2)
         t_ax.set_yticks(ticks[1:])
         t_ax.set_xticklabels(roi_names[:-1], rotation=60, fontsize=12)
-        t_ax.set_yticklabels(roi_names[1:], rotation=0, fontsize=12)
+        t_ax.set_yticklabels([_short_names[x] for x in roi_names[1:]],
+                             rotation=0, fontsize=12)
         t_ax.set_xlabel(group_labels[i_ax], fontsize=12)
         t_ax.set_frame_on(False)
     fig.subplots_adjust(bottom=0, left=0.08, right=0.94)
